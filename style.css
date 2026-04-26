@@ -158,6 +158,33 @@ body {
     border 0.2s ease,
     transform 0.2s ease;
 }
+.form__field select option {
+  background-color: #1e293b;
+  color: #f8fafc;
+}
+
+.form__field select option:disabled {
+  color: #94a3b8;
+}
+
+.form__field select option:checked {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+body.theme-light .form__field select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+body.theme-light .form__field select option:disabled {
+  color: #64748b;
+}
+
+body.theme-light .form__field select option:checked {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
 
 .form__field input:focus,
 .form__field select:focus {
