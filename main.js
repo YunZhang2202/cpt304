@@ -12,6 +12,7 @@ const state = {
   },
   editingId: null,
   pendingDeleteId: null,
+  isSubmitting: false,
   theme: "dark",
 };
 
@@ -26,6 +27,7 @@ const dom = {
   categoryError: document.getElementById("categoryError"),
   dateError: document.getElementById("dateError"),
   submitBtn: document.getElementById("submitBtn"),
+  submitBtnLabel: document.getElementById("submitBtnLabel"),
   cancelEditBtn: document.getElementById("cancelEditBtn"),
   filterCategory: document.getElementById("filterCategory"),
   filterType: document.getElementById("filterType"),
@@ -78,8 +80,11 @@ const loadTheme = () => {
 
 const showToast = (message, variant = "success") => {
   const toast = document.createElement("div");
-  toast.className = `toast${variant === "error" ? " toast--error" : ""}`;
+  toast.className = `toast toast--${variant}`;
   toast.textContent = message;
+  toast.setAttribute("role", variant === "error" ? "alert" : "status");
+  toast.setAttribute("aria-live", variant === "error" ? "assertive" : "polite");
+
   dom.toastContainer.appendChild(toast);
   setTimeout(() => toast.remove(), 2400);
 };
@@ -137,47 +142,74 @@ const validateForm = () => {
   return isValid;
 };
 
+const setSubmitButtonLabel = (label) => {
+  dom.submitBtnLabel.textContent = label;
+};
+
+const setSubmitLoading = (isLoading) => {
+  dom.submitBtn.disabled = isLoading;
+  dom.submitBtn.classList.toggle("is-loading", isLoading);
+  dom.submitBtn.setAttribute("aria-busy", String(isLoading));
+};
+
 const resetFormState = () => {
   dom.form.reset();
   state.editingId = null;
-  dom.submitBtn.textContent = "Add Transaction";
+  setSubmitButtonLabel("Add Transaction");
+  setSubmitLoading(false);
   dom.cancelEditBtn.hidden = true;
   clearErrors();
 };
+const addTransaction = async () => {
+  if (state.isSubmitting) return;
 
-const addTransaction = () => {
   if (!validateForm()) {
     showToast("Please fix the highlighted fields.", "error");
     return;
   }
 
-  const title = dom.titleInput.value.trim();
-  const amount = Number(dom.amountInput.value);
-  const category = dom.categoryInput.value;
-  const date = dom.dateInput.value;
+  state.isSubmitting = true;
+  const wasEditing = Boolean(state.editingId);
 
-  if (state.editingId) {
-    state.transactions = state.transactions.map((tx) =>
-      tx.id === state.editingId ? { ...tx, title, amount, category, date } : tx,
-    );
-    showToast("Transaction updated.");
-  } else {
-    const newTransaction = {
-      id: generateID(),
-      title,
-      amount,
-      category,
-      date,
-    };
+  setSubmitLoading(true);
+  setSubmitButtonLabel(wasEditing ? "Saving..." : "Adding...");
 
-    state.transactions = [newTransaction, ...state.transactions];
-    showToast("Transaction added.");
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
+    const title = dom.titleInput.value.trim();
+    const amount = Number(dom.amountInput.value);
+    const category = dom.categoryInput.value;
+    const date = dom.dateInput.value;
+
+    if (state.editingId) {
+      state.transactions = state.transactions.map((tx) =>
+        tx.id === state.editingId ? { ...tx, title, amount, category, date } : tx,
+      );
+      showToast("Transaction updated.");
+    } else {
+      const newTransaction = {
+        id: generateID(),
+        title,
+        amount,
+        category,
+        date,
+      };
+
+      state.transactions = [newTransaction, ...state.transactions];
+      showToast("Transaction added.");
+    }
+
+    resetFormState();
+    saveToLocalStorage();
+    renderApp();
+  } finally {
+    state.isSubmitting = false;
+    setSubmitLoading(false);
   }
-
-  resetFormState();
-  saveToLocalStorage();
-  renderApp();
 };
+
+
 
 const startEditing = (id) => {
   const transaction = state.transactions.find((tx) => tx.id === id);
@@ -189,7 +221,8 @@ const startEditing = (id) => {
   dom.dateInput.value = transaction.date;
 
   state.editingId = id;
-  dom.submitBtn.textContent = "Save Changes";
+  
+  setSubmitButtonLabel("Save Changes");
   dom.cancelEditBtn.hidden = false;
   dom.titleInput.focus();
   showToast("Editing mode enabled.");
@@ -455,10 +488,12 @@ const initializeApp = () => {
     dom.skeleton.classList.add("is-hidden");
   }, 300);
 
-  dom.form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    addTransaction();
+  dom.form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  await addTransaction();
   });
+
+
 
   dom.cancelEditBtn.addEventListener("click", () => {
     resetFormState();

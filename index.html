@@ -114,8 +114,9 @@
             </label>
 
             <div class="form__actions">
-              <button class="btn btn--primary" type="submit" id="submitBtn">
-                Add Transaction
+              <button class="btn btn--primary" type="submit" id="submitBtn" aria-busy="false">
+                <span class="btn__label" id="submitBtnLabel">Add Transaction</span>
+                <span class="btn__spinner" aria-hidden="true"></span>
               </button>
               <button
                 class="btn btn--ghost"
@@ -209,7 +210,13 @@
       </div>
     </div>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <div
+      class="toast-container"
+      id="toastContainer"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
 
     <script src="main.js"></script>
   </body>
