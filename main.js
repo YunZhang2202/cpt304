@@ -2,6 +2,7 @@
 
 const STORAGE_KEY = "financeTrackerData";
 const THEME_KEY = "financeTrackerTheme";
+const LANGUAGE_KEY = "financeTrackerLanguage";
 
 const state = {
   transactions: [],
@@ -14,6 +15,7 @@ const state = {
   pendingDeleteId: null,
   isSubmitting: false,
   theme: "dark",
+  language: "en",
 };
 
 const dom = {
@@ -27,6 +29,8 @@ const dom = {
   categoryError: document.getElementById("categoryError"),
   dateError: document.getElementById("dateError"),
   submitBtn: document.getElementById("submitBtn"),
+  langEnBtn: document.getElementById("langEnBtn"),
+  langZhBtn: document.getElementById("langZhBtn"),
   submitBtnLabel: document.getElementById("submitBtnLabel"),
   cancelEditBtn: document.getElementById("cancelEditBtn"),
   filterCategory: document.getElementById("filterCategory"),
@@ -46,6 +50,215 @@ const dom = {
   cancelDeleteBtn: document.getElementById("cancelDeleteBtn"),
   toastContainer: document.getElementById("toastContainer"),
   skeleton: document.getElementById("skeleton"),
+};
+const translations = {
+  en: {
+    "app.eyebrow": "Personal Finance",
+    "app.title": "Advanced Finance Tracker",
+    "app.subtitle": "Track income, expenses, and your balance with clarity.",
+
+    "theme.light": "Light Mode",
+    "theme.dark": "Dark Mode",
+    "actions.exportCsv": "Export CSV",
+    "actions.resetFilters": "Reset Filters",
+
+    "summary.balance": "Total Balance",
+    "summary.income": "Total Income",
+    "summary.expenses": "Total Expenses",
+
+    "chart.title": "Cash Flow Overview",
+    "chart.meta": "Income vs Expense",
+    "chart.income": "Income",
+    "chart.expense": "Expense",
+
+    "form.title": "Add Transaction",
+    "form.label.title": "Title",
+    "form.label.amount": "Amount",
+    "form.label.category": "Category",
+    "form.label.date": "Date",
+    "form.placeholder.title": "e.g., Freelance Payment",
+    "form.placeholder.amount": "e.g., 1200 or -45",
+    "form.submit.add": "Add Transaction",
+    "form.submit.adding": "Adding...",
+    "form.submit.save": "Save Changes",
+    "form.submit.saving": "Saving...",
+    "form.cancelEdit": "Cancel Edit",
+
+    "category.select": "Select category",
+    "category.all": "All categories",
+    "category.salary": "Salary",
+    "category.business": "Business",
+    "category.investments": "Investments",
+    "category.housing": "Housing",
+    "category.food": "Food",
+    "category.transport": "Transport",
+    "category.health": "Health",
+    "category.entertainment": "Entertainment",
+    "category.education": "Education",
+    "category.other": "Other",
+
+    "filters.title": "Filters & Search",
+    "filters.category": "Category",
+    "filters.type": "Type",
+    "filters.search": "Search by title",
+    "filters.searchPlaceholder": "Start typing...",
+
+    "type.all": "All",
+    "type.income": "Income",
+    "type.expense": "Expense",
+
+    "transactions.title": "Transactions",
+    "transactions.results": "{count} results",
+    "transactions.empty": "No transactions yet. Add your first one to get started.",
+    "transactions.addFirst": "Add First Transaction",
+    "transactions.edit": "Edit",
+    "transactions.delete": "Delete",
+
+    "modal.deleteTitle": "Delete transaction?",
+    "modal.deleteText": "This action cannot be undone.",
+    "modal.cancel": "Cancel",
+    "modal.delete": "Delete",
+
+    "error.title": "Title is required.",
+    "error.amount": "Enter a valid amount.",
+    "error.category": "Select a category.",
+    "error.date": "Pick a date.",
+
+    "toast.fixFields": "Please fix the highlighted fields.",
+    "toast.added": "Transaction added.",
+    "toast.updated": "Transaction updated.",
+    "toast.deleted": "Transaction deleted.",
+    "toast.editing": "Editing mode enabled.",
+    "toast.noData": "No data to export.",
+    "toast.exported": "CSV exported.",
+  },
+
+  zh: {
+    "app.eyebrow": "个人理财",
+    "app.title": "高级个人财务追踪器",
+    "app.subtitle": "清晰追踪你的收入、支出和余额。",
+
+    "theme.light": "浅色模式",
+    "theme.dark": "深色模式",
+    "actions.exportCsv": "导出 CSV",
+    "actions.resetFilters": "重置筛选",
+
+    "summary.balance": "总余额",
+    "summary.income": "总收入",
+    "summary.expenses": "总支出",
+
+    "chart.title": "现金流概览",
+    "chart.meta": "收入 vs 支出",
+    "chart.income": "收入",
+    "chart.expense": "支出",
+
+    "form.title": "添加交易",
+    "form.label.title": "标题",
+    "form.label.amount": "金额",
+    "form.label.category": "类别",
+    "form.label.date": "日期",
+    "form.placeholder.title": "例如：兼职收入",
+    "form.placeholder.amount": "例如：1200 或 -45",
+    "form.submit.add": "添加交易",
+    "form.submit.adding": "添加中...",
+    "form.submit.save": "保存修改",
+    "form.submit.saving": "保存中...",
+    "form.cancelEdit": "取消编辑",
+
+    "category.select": "选择类别",
+    "category.all": "所有类别",
+    "category.salary": "工资",
+    "category.business": "商业",
+    "category.investments": "投资",
+    "category.housing": "住房",
+    "category.food": "餐饮",
+    "category.transport": "交通",
+    "category.health": "健康",
+    "category.entertainment": "娱乐",
+    "category.education": "教育",
+    "category.other": "其他",
+
+    "filters.title": "筛选与搜索",
+    "filters.category": "类别",
+    "filters.type": "类型",
+    "filters.search": "按标题搜索",
+    "filters.searchPlaceholder": "开始输入...",
+
+    "type.all": "全部",
+    "type.income": "收入",
+    "type.expense": "支出",
+
+    "transactions.title": "交易记录",
+    "transactions.results": "{count} 条结果",
+    "transactions.empty": "还没有交易记录。添加第一条交易开始使用。",
+    "transactions.addFirst": "添加第一条交易",
+    "transactions.edit": "编辑",
+    "transactions.delete": "删除",
+
+    "modal.deleteTitle": "删除这条交易？",
+    "modal.deleteText": "此操作无法撤销。",
+    "modal.cancel": "取消",
+    "modal.delete": "删除",
+
+    "error.title": "请输入标题。",
+    "error.amount": "请输入有效金额。",
+    "error.category": "请选择类别。",
+    "error.date": "请选择日期。",
+
+    "toast.fixFields": "请修正高亮字段。",
+    "toast.added": "交易已添加。",
+    "toast.updated": "交易已更新。",
+    "toast.deleted": "交易已删除。",
+    "toast.editing": "已进入编辑模式。",
+    "toast.noData": "没有可导出的数据。",
+    "toast.exported": "CSV 已导出。",
+  },
+};
+
+const t = (key, replacements = {}) => {
+  let text = translations[state.language]?.[key] || translations.en[key] || key;
+
+  Object.entries(replacements).forEach(([name, value]) => {
+    text = text.replaceAll(`{${name}}`, value);
+  });
+
+  return text;
+};
+
+const applyTranslations = () => {
+  document.documentElement.lang = state.language;
+
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.placeholder = t(element.dataset.i18nPlaceholder);
+  });
+
+  dom.langEnBtn.classList.toggle("is-active", state.language === "en");
+  dom.langZhBtn.classList.toggle("is-active", state.language === "zh");
+
+  dom.themeToggleBtn.textContent =
+    state.theme === "light" ? t("theme.dark") : t("theme.light");
+
+  if (state.editingId) {
+    setSubmitButtonLabel(t("form.submit.save"));
+  } else {
+    setSubmitButtonLabel(t("form.submit.add"));
+  }
+};
+
+const setLanguage = (language) => {
+  state.language = language;
+  localStorage.setItem(LANGUAGE_KEY, language);
+  applyTranslations();
+  renderApp();
+};
+
+const loadLanguage = () => {
+  state.language = localStorage.getItem(LANGUAGE_KEY) || "en";
+  applyTranslations();
 };
 
 const generateID = () => {
@@ -69,7 +282,7 @@ const setTheme = (theme) => {
   state.theme = theme;
   document.body.classList.toggle("theme-light", theme === "light");
   dom.themeToggleBtn.textContent =
-    theme === "light" ? "Dark Mode" : "Light Mode";
+    theme === "light" ? t("theme.dark") : t("theme.light");
   saveTheme();
 };
 
@@ -120,22 +333,22 @@ const validateForm = () => {
   let isValid = true;
 
   if (!title) {
-    setError(dom.titleInput, dom.titleError, "Title is required.");
+    setError(dom.titleInput, dom.titleError, t("error.title"));
     isValid = false;
   }
 
   if (!amountValue || Number.isNaN(amount) || amount === 0) {
-    setError(dom.amountInput, dom.amountError, "Enter a valid amount.");
+    setError(dom.amountInput, dom.amountError, t("error.amount"));
     isValid = false;
   }
 
   if (!category) {
-    setError(dom.categoryInput, dom.categoryError, "Select a category.");
+    setError(dom.categoryInput, dom.categoryError, t("error.category"));
     isValid = false;
   }
 
   if (!date) {
-    setError(dom.dateInput, dom.dateError, "Pick a date.");
+    setError(dom.dateInput, dom.dateError, t("error.date"));
     isValid = false;
   }
 
@@ -155,7 +368,8 @@ const setSubmitLoading = (isLoading) => {
 const resetFormState = () => {
   dom.form.reset();
   state.editingId = null;
-  setSubmitButtonLabel("Add Transaction");
+  setSubmitButtonLabel(t("form.submit.add"));
+  
   setSubmitLoading(false);
   dom.cancelEditBtn.hidden = true;
   clearErrors();
@@ -164,7 +378,8 @@ const addTransaction = async () => {
   if (state.isSubmitting) return;
 
   if (!validateForm()) {
-    showToast("Please fix the highlighted fields.", "error");
+    showToast(t("toast.fixFields"), "error");
+    
     return;
   }
 
@@ -172,7 +387,8 @@ const addTransaction = async () => {
   const wasEditing = Boolean(state.editingId);
 
   setSubmitLoading(true);
-  setSubmitButtonLabel(wasEditing ? "Saving..." : "Adding...");
+  setSubmitButtonLabel(wasEditing ? t("form.submit.saving") : t("form.submit.adding"));
+  
 
   try {
     await new Promise((resolve) => setTimeout(resolve, 400));
@@ -186,7 +402,8 @@ const addTransaction = async () => {
       state.transactions = state.transactions.map((tx) =>
         tx.id === state.editingId ? { ...tx, title, amount, category, date } : tx,
       );
-      showToast("Transaction updated.");
+      showToast(t("toast.updated"));
+      
     } else {
       const newTransaction = {
         id: generateID(),
@@ -197,7 +414,8 @@ const addTransaction = async () => {
       };
 
       state.transactions = [newTransaction, ...state.transactions];
-      showToast("Transaction added.");
+      
+      showToast(t("toast.added"));
     }
 
     resetFormState();
@@ -222,17 +440,19 @@ const startEditing = (id) => {
 
   state.editingId = id;
   
-  setSubmitButtonLabel("Save Changes");
+  
+  setSubmitButtonLabel(t("form.submit.save"));
   dom.cancelEditBtn.hidden = false;
   dom.titleInput.focus();
-  showToast("Editing mode enabled.");
+  showToast(t("toast.editing"));
+  
 };
 
 const deleteTransaction = (id) => {
   state.transactions = state.transactions.filter((tx) => tx.id !== id);
   saveToLocalStorage();
   renderApp();
-  showToast("Transaction deleted.");
+  showToast(t("toast.deleted"));
 };
 
 const openConfirmModal = (id) => {
@@ -268,16 +488,21 @@ const renderSummary = () => {
 const renderTransactions = () => {
   const filtered = filterTransactions();
 
-  dom.resultsCount.textContent = `${filtered.length} results`;
+  dom.resultsCount.textContent = t("transactions.results", {
+  count: filtered.length,
+  });
+
+  
 
   if (filtered.length === 0) {
     dom.transactionsList.innerHTML = `
       <div class="transactions__empty">
-        <div class="empty__icon">+</div>
-        <p>No transactions yet. Add your first one to get started.</p>
-        <button class="btn btn--accent empty-add-btn" type="button">Add First Transaction</button>
+         <div class="empty__icon">+</div>
+         <p>${t("transactions.empty")}</p>
+         <button class="btn btn--accent empty-add-btn" type="button">${t("transactions.addFirst")}</button>
       </div>
-    `;
+`   ;
+
     return;
   }
 
@@ -300,19 +525,36 @@ const renderTransactionItem = (tx) => {
   const formattedAmount = formatCurrency(tx.amount);
   const formattedDate = formatDate(tx.date);
 
+  const categoryKeyMap = {
+  Salary: "category.salary",
+  Business: "category.business",
+  Investments: "category.investments",
+  Housing: "category.housing",
+  Food: "category.food",
+  Transport: "category.transport",
+  Health: "category.health",
+  Entertainment: "category.entertainment",
+  Education: "category.education",
+  Other: "category.other",
+  };
+
+  const getCategoryLabel = (category) => {
+  return t(categoryKeyMap[category] || category);
+  };
+
   return `
     <div class="transaction">
       <div>
         <p class="transaction__title">${tx.title}</p>
         <div class="transaction__meta">
-          <span class="badge">${tx.category}</span>
+          <span class="badge">${getCategoryLabel(tx.category)}</span>
           <span>${formattedDate}</span>
         </div>
       </div>
       <div>
         <p class="amount ${typeClass}">${formattedAmount}</p>
-        <button class="edit-btn" data-id="${tx.id}">Edit</button>
-        <button class="delete-btn" data-id="${tx.id}">Delete</button>
+        <button class="edit-btn" data-id="${tx.id}">${t("transactions.edit")}</button>
+        <button class="delete-btn" data-id="${tx.id}">${t("transactions.delete")}</button>
       </div>
     </div>
   `;
@@ -344,10 +586,14 @@ const groupByMonth = (transactions) => {
   const lookup = new Map();
 
   sorted.forEach((tx) => {
-    const label = new Date(tx.date).toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    });
+    const label = new Date(tx.date).toLocaleDateString(
+      state.language === "zh" ? "zh-CN" : "en-US",
+      {
+        month: "long",
+        year: "numeric",
+      },
+    );
+
 
     if (!lookup.has(label)) {
       lookup.set(label, { label, items: [] });
@@ -361,7 +607,7 @@ const groupByMonth = (transactions) => {
 };
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(state.language === "zh" ? "zh-CN" : "en-US", {
     style: "currency",
     currency: "USD",
   }).format(amount);
@@ -369,7 +615,7 @@ const formatCurrency = (amount) => {
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(state.language === "zh" ? "zh-CN" : "en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -428,8 +674,10 @@ const renderChart = () => {
 
   ctx.fillStyle = "#f8f4e9";
   ctx.font = "14px sans-serif";
-  ctx.fillText("Income", 170, baseY + 20);
-  ctx.fillText("Expense", 160 + barWidth + gap, baseY + 20);
+
+  ctx.fillText(t("chart.income"), 170, baseY + 20);
+  ctx.fillText(t("chart.expense"), 160 + barWidth + gap, baseY + 20);
+
 
   ctx.fillText(formatCurrency(income), 150, baseY - incomeHeight - 10);
   ctx.fillText(
@@ -447,11 +695,21 @@ const renderApp = () => {
 
 const exportToCSV = () => {
   if (state.transactions.length === 0) {
-    showToast("No data to export.", "error");
+    showToast(t("toast.noData"), "error");
+    
     return;
   }
 
-  const headers = ["Title", "Amount", "Category", "Date"];
+  
+  const headers = [
+   t("form.label.title"),
+   t("form.label.amount"),
+   t("form.label.category"),
+   t("form.label.date"),
+  ];
+  
+  
+  
   const rows = state.transactions.map((tx) => [
     tx.title,
     tx.amount,
@@ -475,14 +733,17 @@ const exportToCSV = () => {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-
-  showToast("CSV exported.");
+  showToast(t("toast.exported"));
+  
 };
 
 const initializeApp = () => {
+
   loadFromLocalStorage();
   loadTheme();
+  loadLanguage();
   renderApp();
+
 
   setTimeout(() => {
     dom.skeleton.classList.add("is-hidden");
@@ -491,6 +752,14 @@ const initializeApp = () => {
   dom.form.addEventListener("submit", async (e) => {
   e.preventDefault();
   await addTransaction();
+  });
+
+  dom.langEnBtn.addEventListener("click", () => {
+    setLanguage("en");
+  });
+
+  dom.langZhBtn.addEventListener("click", () => {
+    setLanguage("zh");
   });
 
 
