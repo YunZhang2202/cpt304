@@ -63,6 +63,22 @@ body {
   flex-wrap: wrap;
 }
 
+.language-switch {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lang-btn {
+  padding-inline: 14px;
+}
+
+.lang-btn.is-active {
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+}
+
+
 .app__eyebrow {
   text-transform: uppercase;
   font-size: 12px;
@@ -483,11 +499,11 @@ body.theme-light .form__field select option:checked {
 }
 
 .toast {
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.96);
   border: 1px solid var(--border);
   padding: 12px 16px;
   border-radius: 12px;
-  color: var(--text);
+  color: #f8fafc;
   font-size: 14px;
   box-shadow: var(--shadow);
   animation: toast-in 0.2s ease;
