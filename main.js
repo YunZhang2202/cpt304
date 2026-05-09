@@ -535,32 +535,47 @@ const renderTransactions = () => {
     count: filtered.length,
   });
 
-
+  dom.transactionsList.textContent = "";
 
   if (filtered.length === 0) {
-    dom.transactionsList.innerHTML = `
-      <div class="transactions__empty">
-         <div class="empty__icon">+</div>
-         <p>${t("transactions.empty")}</p>
-         <button class="btn btn--accent empty-add-btn" type="button">${t("transactions.addFirst")}</button>
-      </div>
-`   ;
+    const empty = document.createElement("div");
+    empty.className = "transactions__empty";
 
+    const icon = document.createElement("div");
+    icon.className = "empty__icon";
+    icon.textContent = "+";
+
+    const message = document.createElement("p");
+    message.textContent = t("transactions.empty");
+
+    const button = document.createElement("button");
+    button.className = "btn btn--accent empty-add-btn";
+    button.type = "button";
+    button.textContent = t("transactions.addFirst");
+
+    empty.append(icon, message, button);
+    dom.transactionsList.appendChild(empty);
     return;
   }
 
   const groups = groupByMonth(filtered);
 
-  dom.transactionsList.innerHTML = groups
-    .map(
-      (group) => `
-        <div class="month-group">
-          <p class="month-title">${group.label}</p>
-          ${group.items.map(renderTransactionItem).join("")}
-        </div>
-      `,
-    )
-    .join("");
+  groups.forEach((group) => {
+    const groupEl = document.createElement("div");
+    groupEl.className = "month-group";
+
+    const title = document.createElement("p");
+    title.className = "month-title";
+    title.textContent = group.label;
+
+    groupEl.appendChild(title);
+
+    group.items.forEach((tx) => {
+      groupEl.appendChild(renderTransactionItem(tx));
+    });
+
+    dom.transactionsList.appendChild(groupEl);
+  });
 };
 
 const renderTransactionItem = (tx) => {
@@ -585,22 +600,48 @@ const renderTransactionItem = (tx) => {
     return t(categoryKeyMap[category] || category);
   };
 
-  return `
-    <div class="transaction">
-      <div>
-        <p class="transaction__title">${tx.title}</p>
-        <div class="transaction__meta">
-          <span class="badge">${getCategoryLabel(tx.category)}</span>
-          <span>${formattedDate}</span>
-        </div>
-      </div>
-      <div>
-        <p class="amount ${typeClass}">${formattedAmount}</p>
-        <button class="edit-btn" data-id="${tx.id}">${t("transactions.edit")}</button>
-        <button class="delete-btn" data-id="${tx.id}">${t("transactions.delete")}</button>
-      </div>
-    </div>
-  `;
+  const item = document.createElement("div");
+  item.className = "transaction";
+
+  const left = document.createElement("div");
+
+  const title = document.createElement("p");
+  title.className = "transaction__title";
+  title.textContent = tx.title;
+
+  const meta = document.createElement("div");
+  meta.className = "transaction__meta";
+
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.textContent = getCategoryLabel(tx.category);
+
+  const date = document.createElement("span");
+  date.textContent = formattedDate;
+
+  meta.append(badge, date);
+  left.append(title, meta);
+
+  const right = document.createElement("div");
+
+  const amount = document.createElement("p");
+  amount.className = `amount ${typeClass}`;
+  amount.textContent = formattedAmount;
+
+  const editBtn = document.createElement("button");
+  editBtn.className = "edit-btn";
+  editBtn.dataset.id = tx.id;
+  editBtn.textContent = t("transactions.edit");
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "delete-btn";
+  deleteBtn.dataset.id = tx.id;
+  deleteBtn.textContent = t("transactions.delete");
+
+  right.append(amount, editBtn, deleteBtn);
+  item.append(left, right);
+
+  return item;
 };
 
 const filterTransactions = () => {
