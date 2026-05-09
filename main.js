@@ -877,4 +877,22 @@ const initializeApp = () => {
   });
 };
 
-initializeApp();
+// initializeApp();
+
+if (
+  typeof window !== "undefined" &&
+  typeof document !== "undefined" &&
+  !window.__TEST__
+) {
+  initializeApp();
+}
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    STORAGE_KEY,
+    state,
+    saveToLocalStorage,
+    loadFromLocalStorage,
+    isValidTransaction,
+  };
+}
