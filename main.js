@@ -225,9 +225,10 @@ const t = (key, replacements = {}) => {
   return text;
 };
 
+
 const applyTranslations = () => {
   document.documentElement.lang = state.language;
-
+  
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     element.textContent = t(element.dataset.i18n);
   });
@@ -777,6 +778,18 @@ const renderApp = () => {
   renderChart();
 };
 
+
+const sanitizeCSVField = (value) => {
+  const stringValue = String(value ?? "");
+
+  // Prevent CSV formula injection in spreadsheet software.
+  if (/^[=+\-@]/.test(stringValue)) {
+    return `'${stringValue}`;
+  }
+
+  return stringValue;
+};
+
 const exportToCSV = () => {
   if (state.transactions.length === 0) {
     showToast(t("toast.noData"), "error");
@@ -795,11 +808,12 @@ const exportToCSV = () => {
 
 
   const rows = state.transactions.map((tx) => [
-    tx.title,
-    tx.amount,
-    tx.category,
-    tx.date,
+    sanitizeCSVField(tx.title),
+    sanitizeCSVField(tx.amount),
+    sanitizeCSVField(tx.category),
+    sanitizeCSVField(tx.date),
   ]);
+
 
   const csv = [headers, ...rows]
     .map((row) =>
