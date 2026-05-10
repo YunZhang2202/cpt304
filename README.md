@@ -1,21 +1,16 @@
+[![Jest Tests](https://github.com/YunZhang2202/cpt304/actions/workflows/test.yml/badge.svg)](https://github.com/YunZhang2202/cpt304/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/YunZhang2202/cpt304/branch/main/graph/badge.svg)](https://codecov.io/gh/YunZhang2202/cpt304)
+
+
 # Advanced Finance Tracker
 
 A portfolio-level personal finance management application built with HTML, CSS, and Vanilla JavaScript.  
 This project was intentionally developed without frameworks or third-party libraries to demonstrate a strong understanding of core front-end fundamentals and application architecture.
 
 Live Demo:  
-https://amirhosseinln.github.io/advanced-finance-tracker/
+https://cpt304.onrender.com
 
 ---
-
-## Preview
-
-<p align="center">
-  <img src="./AmirhosseinProject-Preview.png" alt="Advanced Finance Tracker Preview" width="100%" />
-</p>
-
----
-
 ## Overview
 
 The Advanced Finance Tracker is a structured, state-driven front-end application designed to simulate a production-style user experience.
@@ -109,9 +104,6 @@ This structure reflects patterns commonly used in small-to-medium scale front-en
 - Canvas API  
 - LocalStorage API  
 
-No frameworks.  
-No external libraries.  
-No UI toolkits.  
 
 ---
 
@@ -135,8 +127,3 @@ No UI toolkits.
 - Data import functionality  
 
 ---
-
-## Author
-
-Amirhossein Latifi Navid  
-Front-End Developer
