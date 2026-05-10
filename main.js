@@ -3,6 +3,7 @@
 const STORAGE_KEY = "financeTrackerData";
 const THEME_KEY = "financeTrackerTheme";
 const LANGUAGE_KEY = "financeTrackerLanguage";
+const COOKIE_CONSENT_KEY = "financeTrackerCookieConsent";
 
 const state = {
   transactions: [],
@@ -49,6 +50,10 @@ const dom = {
   confirmDeleteBtn: document.getElementById("confirmDeleteBtn"),
   cancelDeleteBtn: document.getElementById("cancelDeleteBtn"),
   toastContainer: document.getElementById("toastContainer"),
+  cookieBanner: document.getElementById("cookieBanner"),
+  cookieAcceptBtn: document.getElementById("cookieAcceptBtn"),
+  cookieRejectBtn: document.getElementById("cookieRejectBtn"),
+  cookieNecessaryBtn: document.getElementById("cookieNecessaryBtn"),
   skeleton: document.getElementById("skeleton"),
 };
 const translations = {
@@ -61,6 +66,16 @@ const translations = {
     "theme.dark": "Dark Mode",
     "actions.exportCsv": "Export CSV",
     "actions.resetFilters": "Reset Filters",
+
+    "privacy.link": "Privacy Policy",
+
+    "cookie.title": "Cookie Preferences",
+    "cookie.message": "We use necessary local storage to save your finance records, theme, language, and cookie choice. Non-essential features are only enabled with your consent.",
+    "cookie.necessary": "Necessary Only",
+    "cookie.reject": "Reject",
+    "cookie.accept": "Accept All",
+    "toast.cookieSaved": "Cookie preference saved.",
+    "toast.cookieAccepted": "All cookie preferences accepted.",
 
     "summary.balance": "Total Balance",
     "summary.income": "Total Income",
@@ -142,6 +157,16 @@ const translations = {
     "theme.dark": "深色模式",
     "actions.exportCsv": "导出 CSV",
     "actions.resetFilters": "重置筛选",
+
+    "privacy.link": "隐私政策",
+
+    "cookie.title": "Cookie 偏好设置",
+    "cookie.message": "我们使用必要的本地存储来保存你的财务记录、主题、语言和 Cookie 选择。非必要功能只会在你同意后启用。",
+    "cookie.necessary": "仅必要",
+    "cookie.reject": "拒绝",
+    "cookie.accept": "全部接受",
+    "toast.cookieSaved": "Cookie 偏好已保存。",
+    "toast.cookieAccepted": "已接受全部 Cookie 偏好。",
 
     "summary.balance": "总余额",
     "summary.income": "总收入",
@@ -261,6 +286,37 @@ const loadLanguage = () => {
   state.language = localStorage.getItem(LANGUAGE_KEY) || "en";
   applyTranslations();
 };
+
+
+const getCookieConsent = () => {
+  const storedConsent = localStorage.getItem(COOKIE_CONSENT_KEY);
+  return storedConsent ? JSON.parse(storedConsent) : null;
+};
+
+const saveCookieConsent = (choice) => {
+  const consent = {
+    choice,
+    savedAt: new Date().toISOString(),
+  };
+
+  localStorage.setItem(COOKIE_CONSENT_KEY, JSON.stringify(consent));
+  dom.cookieBanner.hidden = true;
+
+  if (choice === "accepted") {
+    showToast(t("toast.cookieAccepted"));
+  } else {
+    showToast(t("toast.cookieSaved"));
+  }
+};
+
+const initializeCookieBanner = () => {
+  const consent = getCookieConsent();
+
+  if (!consent) {
+    dom.cookieBanner.hidden = false;
+  }
+};
+
 
 const generateID = () => {
   return `tx_${Date.now()}_${Math.random().toString(16).slice(2)}`;
@@ -841,6 +897,7 @@ const initializeApp = () => {
   loadTheme();
   loadLanguage();
   renderApp();
+  initializeCookieBanner();
 
 
   setTimeout(() => {
@@ -858,6 +915,18 @@ const initializeApp = () => {
 
   dom.langZhBtn.addEventListener("click", () => {
     setLanguage("zh");
+  });
+
+  dom.cookieAcceptBtn.addEventListener("click", () => {
+    saveCookieConsent("accepted");
+  });
+
+  dom.cookieRejectBtn.addEventListener("click", () => {
+    saveCookieConsent("rejected");
+  });
+
+  dom.cookieNecessaryBtn.addEventListener("click", () => {
+    saveCookieConsent("necessary");
   });
 
 
@@ -930,6 +999,7 @@ const initializeApp = () => {
       closeConfirmModal();
     }
   });
+
 };
 
 // initializeApp();

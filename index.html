@@ -41,6 +41,9 @@
           <button class="btn btn--ghost" id="resetFiltersBtn" type="button" data-i18n="actions.resetFilters">
             Reset Filters
           </button>
+          <a class="btn btn--ghost privacy-link" href="privacy.html" data-i18n="privacy.link">
+            Privacy Policy
+          </a>
         </div>
       </header>
 
@@ -221,6 +224,42 @@
         </div>
       </div>
     </div>
+    <div
+      class="cookie-banner"
+      id="cookieBanner"
+      role="dialog"
+      aria-live="polite"
+      aria-labelledby="cookieTitle"
+      aria-describedby="cookieText"
+      hidden
+    >
+    <div class="cookie-banner__content">
+    <div>
+      <h3 class="cookie-banner__title" id="cookieTitle" data-i18n="cookie.title">
+        Cookie Preferences
+      </h3>
+      <p class="cookie-banner__text" id="cookieText" data-i18n="cookie.message">
+        We use necessary local storage to save your finance records, theme, language, and cookie choice. Non-essential features are only enabled with your consent.
+      </p>
+      <a class="cookie-banner__link" href="privacy.html" data-i18n="privacy.link">
+        Privacy Policy
+      </a>
+    </div>
+
+    <div class="cookie-banner__actions">
+      <button class="btn btn--ghost" id="cookieNecessaryBtn" type="button" data-i18n="cookie.necessary">
+        Necessary Only
+      </button>
+      <button class="btn btn--ghost" id="cookieRejectBtn" type="button" data-i18n="cookie.reject">
+        Reject
+      </button>
+      <button class="btn btn--primary" id="cookieAcceptBtn" type="button" data-i18n="cookie.accept">
+        Accept All
+      </button>
+    </div>
+  </div>
+</div>
+
 
     <div
       class="toast-container"
