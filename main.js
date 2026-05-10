@@ -3,6 +3,7 @@
 const STORAGE_KEY = "financeTrackerData";
 const THEME_KEY = "financeTrackerTheme";
 const LANGUAGE_KEY = "financeTrackerLanguage";
+const COOKIE_KEY = "cookieConsent";
 
 const state = {
   transactions: [],
@@ -50,6 +51,10 @@ const dom = {
   cancelDeleteBtn: document.getElementById("cancelDeleteBtn"),
   toastContainer: document.getElementById("toastContainer"),
   skeleton: document.getElementById("skeleton"),
+  cookieBanner: document.getElementById("cookieBanner"),
+  acceptBtn: document.getElementById("acceptBtn"),
+  rejectBtn: document.getElementById("rejectBtn"),
+  necessaryBtn: document.getElementById("necessaryBtn"),
 };
 const translations = {
   en: {
@@ -333,6 +338,22 @@ const setTheme = (theme) => {
 const loadTheme = () => {
   const storedTheme = localStorage.getItem(THEME_KEY);
   setTheme(storedTheme || "dark");
+};
+
+const saveCookieConsent = (choice) => {
+  localStorage.setItem(COOKIE_KEY, choice);
+
+  if (dom.cookieBanner) {
+    dom.cookieBanner.classList.add("hidden");
+  }
+};
+
+const loadCookieConsent = () => {
+  const consent = localStorage.getItem(COOKIE_KEY);
+
+  if (!consent && dom.cookieBanner) {
+    dom.cookieBanner.classList.remove("hidden");
+  }
 };
 
 const showToast = (message, variant = "success") => {
@@ -841,6 +862,7 @@ const initializeApp = () => {
   loadTheme();
   loadLanguage();
   renderApp();
+  loadCookieConsent();
 
 
   setTimeout(() => {
@@ -911,6 +933,20 @@ const initializeApp = () => {
   });
 
   dom.exportCsvBtn.addEventListener("click", exportToCSV);
+
+  if (dom.acceptBtn && dom.rejectBtn && dom.necessaryBtn) {
+    dom.acceptBtn.addEventListener("click", () => {
+      saveCookieConsent("accept-all");
+    });
+  
+    dom.rejectBtn.addEventListener("click", () => {
+      saveCookieConsent("reject");
+    });
+  
+    dom.necessaryBtn.addEventListener("click", () => {
+      saveCookieConsent("necessary-only");
+    });
+  }
 
   dom.themeToggleBtn.addEventListener("click", () => {
     setTheme(state.theme === "dark" ? "light" : "dark");
