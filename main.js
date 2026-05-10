@@ -342,13 +342,16 @@ const loadTheme = () => {
 
 const saveCookieConsent = (choice) => {
   localStorage.setItem(COOKIE_KEY, choice);
-  dom.cookieBanner.classList.add("hidden");
+
+  if (dom.cookieBanner) {
+    dom.cookieBanner.classList.add("hidden");
+  }
 };
 
 const loadCookieConsent = () => {
   const consent = localStorage.getItem(COOKIE_KEY);
 
-  if (!consent) {
+  if (!consent && dom.cookieBanner) {
     dom.cookieBanner.classList.remove("hidden");
   }
 };
@@ -931,17 +934,19 @@ const initializeApp = () => {
 
   dom.exportCsvBtn.addEventListener("click", exportToCSV);
 
-  dom.acceptBtn.addEventListener("click", () => {
-    saveCookieConsent("accept-all");
-  });
+  if (dom.acceptBtn && dom.rejectBtn && dom.necessaryBtn) {
+    dom.acceptBtn.addEventListener("click", () => {
+      saveCookieConsent("accept-all");
+    });
   
-  dom.rejectBtn.addEventListener("click", () => {
-    saveCookieConsent("reject");
-  });
+    dom.rejectBtn.addEventListener("click", () => {
+      saveCookieConsent("reject");
+    });
   
-  dom.necessaryBtn.addEventListener("click", () => {
-    saveCookieConsent("necessary-only");
-  });
+    dom.necessaryBtn.addEventListener("click", () => {
+      saveCookieConsent("necessary-only");
+    });
+  }
 
   dom.themeToggleBtn.addEventListener("click", () => {
     setTheme(state.theme === "dark" ? "light" : "dark");
