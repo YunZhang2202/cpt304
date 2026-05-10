@@ -1,0 +1,26 @@
+{
+  "name": "cpt304",
+  "version": "1.0.0",
+  "description": "A portfolio-level personal finance management application built with HTML, CSS, and Vanilla JavaScript.  \r This project was intentionally developed without frameworks or third-party libraries to demonstrate a strong understanding of core front-end fundamentals and application architecture.",
+  "main": "main.js",
+  "scripts": {
+    "test": "jest",
+    "coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YunZhang2202/cpt304.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/YunZhang2202/cpt304/issues"
+  },
+  "homepage": "https://github.com/YunZhang2202/cpt304#readme",
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1"
+  }
+}

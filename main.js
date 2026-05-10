@@ -266,13 +266,56 @@ const generateID = () => {
   return `tx_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 };
 
+// const saveToLocalStorage = () => {
+//   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions));
+// };
+
+// const loadFromLocalStorage = () => {
+//   const stored = localStorage.getItem(STORAGE_KEY);
+//   state.transactions = stored ? JSON.parse(stored) : [];
+// };
+
 const saveToLocalStorage = () => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions));
 };
 
+const isValidTransaction = (tx) => {
+  return (
+    tx &&
+    typeof tx.id === "string" &&
+    typeof tx.title === "string" &&
+    typeof tx.amount === "number" &&
+    Number.isFinite(tx.amount) &&
+    typeof tx.category === "string" &&
+    typeof tx.date === "string"
+  );
+};
+
 const loadFromLocalStorage = () => {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  state.transactions = stored ? JSON.parse(stored) : [];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (!stored) {
+      state.transactions = [];
+      return;
+    }
+
+    const parsedTransactions = JSON.parse(stored);
+
+    if (!Array.isArray(parsedTransactions)) {
+      throw new Error("Stored transactions must be an array.");
+    }
+
+    state.transactions = parsedTransactions.filter(isValidTransaction);
+  } catch (error) {
+    console.warn("Corrupted LocalStorage data was detected and reset.", error);
+    localStorage.removeItem(STORAGE_KEY);
+    state.transactions = [];
+
+    if (dom.toastContainer) {
+      showToast("Saved data was corrupted and has been reset.", "error");
+    }
+  }
 };
 
 const saveTheme = () => {
@@ -370,7 +413,7 @@ const resetFormState = () => {
   dom.form.reset();
   state.editingId = null;
   setSubmitButtonLabel(t("form.submit.add"));
-  
+
   setSubmitLoading(false);
   dom.cancelEditBtn.hidden = true;
   clearErrors();
@@ -380,7 +423,7 @@ const addTransaction = async () => {
 
   if (!validateForm()) {
     showToast(t("toast.fixFields"), "error");
-    
+
     return;
   }
 
@@ -389,7 +432,7 @@ const addTransaction = async () => {
 
   setSubmitLoading(true);
   setSubmitButtonLabel(wasEditing ? t("form.submit.saving") : t("form.submit.adding"));
-  
+
 
   try {
     await new Promise((resolve) => setTimeout(resolve, 400));
@@ -404,7 +447,7 @@ const addTransaction = async () => {
         tx.id === state.editingId ? { ...tx, title, amount, category, date } : tx,
       );
       showToast(t("toast.updated"));
-      
+
     } else {
       const newTransaction = {
         id: generateID(),
@@ -415,7 +458,7 @@ const addTransaction = async () => {
       };
 
       state.transactions = [newTransaction, ...state.transactions];
-      
+
       showToast(t("toast.added"));
     }
 
@@ -440,13 +483,13 @@ const startEditing = (id) => {
   dom.dateInput.value = transaction.date;
 
   state.editingId = id;
-  
-  
+
+
   setSubmitButtonLabel(t("form.submit.save"));
   dom.cancelEditBtn.hidden = false;
   dom.titleInput.focus();
   showToast(t("toast.editing"));
-  
+
 };
 
 const deleteTransaction = (id) => {
@@ -750,20 +793,20 @@ const sanitizeCSVField = (value) => {
 const exportToCSV = () => {
   if (state.transactions.length === 0) {
     showToast(t("toast.noData"), "error");
-    
+
     return;
   }
 
-  
+
   const headers = [
-   t("form.label.title"),
-   t("form.label.amount"),
-   t("form.label.category"),
-   t("form.label.date"),
+    t("form.label.title"),
+    t("form.label.amount"),
+    t("form.label.category"),
+    t("form.label.date"),
   ];
-  
-  
-  
+
+
+
   const rows = state.transactions.map((tx) => [
     sanitizeCSVField(tx.title),
     sanitizeCSVField(tx.amount),
@@ -789,7 +832,7 @@ const exportToCSV = () => {
   link.remove();
   URL.revokeObjectURL(url);
   showToast(t("toast.exported"));
-  
+
 };
 
 const initializeApp = () => {
@@ -805,8 +848,8 @@ const initializeApp = () => {
   }, 300);
 
   dom.form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  await addTransaction();
+    e.preventDefault();
+    await addTransaction();
   });
 
   dom.langEnBtn.addEventListener("click", () => {
@@ -889,4 +932,22 @@ const initializeApp = () => {
   });
 };
 
-initializeApp();
+// initializeApp();
+
+if (
+  typeof window !== "undefined" &&
+  typeof document !== "undefined" &&
+  !window.__TEST__
+) {
+  initializeApp();
+}
+
+if (typeof module !== "undefined") {
+  module.exports = {
+    STORAGE_KEY,
+    state,
+    saveToLocalStorage,
+    loadFromLocalStorage,
+    isValidTransaction,
+  };
+}
